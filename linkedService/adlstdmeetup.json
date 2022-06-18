@@ -1,0 +1,10 @@
+{
+	"name": "adlstdmeetup",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlstdmeetup.dfs.core.windows.net/"
+		}
+	}
+}
