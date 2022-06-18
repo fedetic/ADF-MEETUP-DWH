@@ -1,0 +1,9 @@
+{
+	"name": "pl_load_json_to_dwh",
+	"properties": {
+		"folder": {
+			"name": "Load"
+		},
+		"annotations": []
+	}
+}
