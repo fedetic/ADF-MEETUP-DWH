@@ -1,0 +1,12 @@
+{
+	"name": "ds_sqldb_meetup",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldb_meetup",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
