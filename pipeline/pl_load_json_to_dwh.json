@@ -28,10 +28,75 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true
+						},
+						"sqlWriterUseTableLock": true,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['city']"
+								},
+								"sink": {
+									"name": "city",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['country']"
+								},
+								"sink": {
+									"name": "country",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['name']"
+								},
+								"sink": {
+									"name": "name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lon']"
+								},
+								"sink": {
+									"name": "lon",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"path": "$['venue_id']"
+								},
+								"sink": {
+									"name": "venue_id",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lat']"
+								},
+								"sink": {
+									"name": "lat",
+									"type": "Double"
+								}
+							}
+						],
+						"collectionReference": ""
+					}
 				},
 				"inputs": [
 					{
@@ -56,20 +121,27 @@
 				"outputs": [
 					{
 						"referenceName": "ds_sqldb_meetup",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "dbo",
+							"table_name": "venues"
+						}
 					}
 				]
 			}
 		],
 		"parameters": {
 			"container": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "raw"
 			},
 			"folder": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "venues"
 			},
 			"file_name": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "venues.json"
 			}
 		},
 		"folder": {
