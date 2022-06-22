@@ -67,7 +67,7 @@
 											"type": "Expression"
 										},
 										"folder": {
-											"value": "@pipeline().parameters.folder",
+											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
 											"type": "Expression"
 										},
 										"object": {
