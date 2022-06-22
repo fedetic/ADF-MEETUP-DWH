@@ -3,8 +3,100 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Load JSON into DWH",
-				"type": "Copy",
+				"name": "For each object",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata').output.childItems",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Load JSON into DWH",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',item().name,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',item().name,'\nEND')}",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": true,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "json_file",
+									"type": "DatasetReference",
+									"parameters": {
+										"container": {
+											"value": "@pipeline().parameters.container",
+											"type": "Expression"
+										},
+										"folder": {
+											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+											"type": "Expression"
+										},
+										"object": {
+											"value": "@concat(item().name, '.json')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqldb_meetup",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": "dbo",
+										"table_name": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Get Metadata",
+				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,94 +107,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"venue_id"
-							]
-						},
-						"sqlWriterUseTableLock": true,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"path": "$['city']"
-								},
-								"sink": {
-									"name": "city",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['country']"
-								},
-								"sink": {
-									"name": "country",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['name']"
-								},
-								"sink": {
-									"name": "name",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lon']"
-								},
-								"sink": {
-									"name": "lon",
-									"type": "Double"
-								}
-							},
-							{
-								"source": {
-									"path": "$['venue_id']"
-								},
-								"sink": {
-									"name": "venue_id",
-									"type": "Int32"
-								}
-							},
-							{
-								"source": {
-									"path": "$['lat']"
-								},
-								"sink": {
-									"name": "lat",
-									"type": "Double"
-								}
-							}
-						],
-						"collectionReference": ""
-					}
-				},
-				"inputs": [
-					{
+					"dataset": {
 						"referenceName": "json_file",
 						"type": "DatasetReference",
 						"parameters": {
@@ -114,23 +119,20 @@
 								"value": "@pipeline().parameters.folder",
 								"type": "Expression"
 							},
-							"file_name": {
-								"value": "@pipeline().parameters.file_name",
-								"type": "Expression"
-							}
+							"object": "/"
 						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
 					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_sqldb_meetup",
-						"type": "DatasetReference",
-						"parameters": {
-							"schema": "dbo",
-							"table_name": "venues"
-						}
-					}
-				]
+				}
 			}
 		],
 		"parameters": {
@@ -140,11 +142,7 @@
 			},
 			"folder": {
 				"type": "string",
-				"defaultValue": "venues"
-			},
-			"file_name": {
-				"type": "string",
-				"defaultValue": "venues.json"
+				"defaultValue": "data"
 			}
 		},
 		"folder": {
