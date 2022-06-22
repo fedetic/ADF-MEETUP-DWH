@@ -32,7 +32,7 @@
 						"upsertSettings": {
 							"useTempDB": true,
 							"keys": [
-								"venue_id"
+								"group_id"
 							]
 						},
 						"sqlWriterUseTableLock": true,
@@ -127,7 +127,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"schema": "dbo",
-							"table_name": "venues"
+							"table_name": {
+								"value": "@pipeline().parameters.folder",
+								"type": "Expression"
+							}
 						}
 					}
 				]
