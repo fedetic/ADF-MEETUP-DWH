@@ -203,9 +203,6 @@
 			"folder": {
 				"type": "string",
 				"defaultValue": "data"
-			},
-			"object": {
-				"type": "string"
 			}
 		},
 		"folder": {
