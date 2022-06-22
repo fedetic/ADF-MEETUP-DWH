@@ -15,6 +15,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata').output.childItems",
+						"type": "Expression"
+					},
 					"activities": [
 						{
 							"name": "Load JSON into DWH",
@@ -43,7 +47,7 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"preCopyScript": {
-										"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',pipeline().parameters.object,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',pipeline().parameters.object,'\nEND')}",
+										"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',item().name,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',item().name,'\nEND')}",
 										"type": "Expression"
 									},
 									"writeBehavior": "insert",
@@ -127,7 +131,7 @@
 											"type": "Expression"
 										},
 										"object": {
-											"value": "@pipeline().parameters.object",
+											"value": "@item().name",
 											"type": "Expression"
 										}
 									}
@@ -140,7 +144,7 @@
 									"parameters": {
 										"schema": "dbo",
 										"table_name": {
-											"value": "@pipeline().parameters.object",
+											"value": "@item().name",
 											"type": "Expression"
 										}
 									}
@@ -167,8 +171,15 @@
 						"referenceName": "json_file",
 						"type": "DatasetReference",
 						"parameters": {
-							"container": "raw",
-							"folder": "data"
+							"container": {
+								"value": "@pipeline().parameters.container",
+								"type": "Expression"
+							},
+							"folder": {
+								"value": "@pipeline().parameters.folder",
+								"type": "Expression"
+							},
+							"object": "/"
 						}
 					},
 					"fieldList": [
@@ -191,7 +202,7 @@
 			},
 			"folder": {
 				"type": "string",
-				"defaultValue": "groups"
+				"defaultValue": "data"
 			},
 			"object": {
 				"type": "string"
