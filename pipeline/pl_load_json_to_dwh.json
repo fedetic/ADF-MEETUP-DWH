@@ -55,67 +55,7 @@
 									"tableOption": "autoCreate",
 									"disableMetricsCollection": false
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"path": "$['city']"
-											},
-											"sink": {
-												"name": "city",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['country']"
-											},
-											"sink": {
-												"name": "country",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['name']"
-											},
-											"sink": {
-												"name": "name",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lon']"
-											},
-											"sink": {
-												"name": "lon",
-												"type": "Double"
-											}
-										},
-										{
-											"source": {
-												"path": "$['venue_id']"
-											},
-											"sink": {
-												"name": "venue_id",
-												"type": "Int32"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lat']"
-											},
-											"sink": {
-												"name": "lat",
-												"type": "Double"
-											}
-										}
-									],
-									"collectionReference": ""
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
