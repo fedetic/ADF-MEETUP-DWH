@@ -141,10 +141,6 @@
 			"folder": {
 				"type": "string",
 				"defaultValue": "groups"
-			},
-			"file_name": {
-				"type": "string",
-				"defaultValue": "groups.json"
 			}
 		},
 		"folder": {
