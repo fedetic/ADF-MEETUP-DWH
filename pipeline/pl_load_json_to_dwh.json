@@ -28,13 +28,11 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"group_id"
-							]
+						"preCopyScript": {
+							"value": "@{concat('TRUNCATE TABLE dbo.''',pipeline().parameters.folder,'''')}",
+							"type": "Expression"
 						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": true,
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
