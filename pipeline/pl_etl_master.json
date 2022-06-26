@@ -5,14 +5,7 @@
 			{
 				"name": "Transform",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Load into SQL DB",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
@@ -31,7 +24,14 @@
 			{
 				"name": "Load into SQL DB",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Transform",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
