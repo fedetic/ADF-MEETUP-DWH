@@ -12,7 +12,10 @@
 						"referenceName": "pl_transform_raw_enriched",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"tables": "events"
+					}
 				}
 			},
 			{
