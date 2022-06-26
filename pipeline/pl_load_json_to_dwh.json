@@ -21,7 +21,7 @@
 					},
 					"activities": [
 						{
-							"name": "Load JSON into DWH",
+							"name": "Load parquet into DWH",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
