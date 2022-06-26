@@ -1,0 +1,13 @@
+{
+	"name": "AzureDatabricks",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-2205506695373671.11.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/5d3db1b5-2ab6-467b-96ea-50a237fd3de7/resourceGroups/meetup/providers/Microsoft.Databricks/workspaces/db-td-meetup",
+			"existingClusterId": "0623-145638-6tnsg6l8"
+		}
+	}
+}
