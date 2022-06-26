@@ -30,7 +30,7 @@
 			}
 		],
 		"parameters": {
-			"tables": {
+			"files": {
 				"type": "string"
 			}
 		},
