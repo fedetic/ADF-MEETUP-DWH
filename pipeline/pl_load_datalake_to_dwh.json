@@ -3,26 +3,196 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "For each object",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Get Metadata",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"name": "Copy all tables",
+				"type": "IfCondition",
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"items": {
-						"value": "@activity('Get Metadata').output.childItems",
+					"expression": {
+						"value": "@equals(pipeline().parameters.files, '')",
 						"type": "Expression"
 					},
-					"activities": [
+					"ifFalseActivities": [
 						{
-							"name": "Load parquet into DWH",
-							"type": "Copy",
+							"name": "For each object in subset",
+							"type": "ForEach",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@createArray(pipeline().parameters.files)",
+									"type": "Expression"
+								},
+								"activities": [
+									{
+										"name": "Load parquet into DWH_copy1",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "ParquetSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true,
+													"wildcardFolderPath": {
+														"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+														"type": "Expression"
+													},
+													"wildcardFileName": "*.parquet",
+													"enablePartitionDiscovery": false
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": {
+													"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',item().name,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',item().name,'\nEND')}",
+													"type": "Expression"
+												},
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": true,
+												"tableOption": "autoCreate",
+												"disableMetricsCollection": false
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "Parquet",
+												"type": "DatasetReference",
+												"parameters": {
+													"container": {
+														"value": "@pipeline().parameters.container",
+														"type": "Expression"
+													},
+													"folder": {
+														"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+														"type": "Expression"
+													},
+													"object": "*.parquet"
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_sqldb_meetup",
+												"type": "DatasetReference",
+												"parameters": {
+													"schema": "dbo",
+													"table_name": {
+														"value": "@item().name",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "For each object",
+							"type": "ForEach",
+							"dependsOn": [
+								{
+									"activity": "Get Metadata",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('Get Metadata').output.childItems",
+									"type": "Expression"
+								},
+								"activities": [
+									{
+										"name": "Load parquet into DWH",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "ParquetSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": true,
+													"wildcardFolderPath": {
+														"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+														"type": "Expression"
+													},
+													"wildcardFileName": "*.parquet",
+													"enablePartitionDiscovery": false
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"preCopyScript": {
+													"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',item().name,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',item().name,'\nEND')}",
+													"type": "Expression"
+												},
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": true,
+												"tableOption": "autoCreate",
+												"disableMetricsCollection": false
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "Parquet",
+												"type": "DatasetReference",
+												"parameters": {
+													"container": {
+														"value": "@pipeline().parameters.container",
+														"type": "Expression"
+													},
+													"folder": {
+														"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+														"type": "Expression"
+													},
+													"object": "*.parquet"
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_sqldb_meetup",
+												"type": "DatasetReference",
+												"parameters": {
+													"schema": "dbo",
+													"table_name": {
+														"value": "@item().name",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "Get Metadata",
+							"type": "GetMetadata",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
@@ -33,34 +203,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"source": {
-									"type": "ParquetSource",
-									"storeSettings": {
-										"type": "AzureBlobFSReadSettings",
-										"recursive": true,
-										"wildcardFolderPath": {
-											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
-											"type": "Expression"
-										},
-										"wildcardFileName": "*.parquet",
-										"enablePartitionDiscovery": false
-									}
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"preCopyScript": {
-										"value": "@{concat('IF (EXISTS (SELECT * \n                 FROM INFORMATION_SCHEMA.TABLES \n                 WHERE TABLE_SCHEMA = ''dbo'' \n                 AND  TABLE_NAME = ''',item().name,'''))\nBEGIN\n    TRUNCATE TABLE dbo.',item().name,'\nEND')}",
-										"type": "Expression"
-									},
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": true,
-									"tableOption": "autoCreate",
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false
-							},
-							"inputs": [
-								{
+								"dataset": {
 									"referenceName": "Parquet",
 									"type": "DatasetReference",
 									"parameters": {
@@ -69,66 +212,23 @@
 											"type": "Expression"
 										},
 										"folder": {
-											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+											"value": "@pipeline().parameters.folder",
 											"type": "Expression"
 										},
-										"object": "*.parquet"
+										"object": "/"
 									}
+								},
+								"fieldList": [
+									"childItems"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
 								}
-							],
-							"outputs": [
-								{
-									"referenceName": "ds_sqldb_meetup",
-									"type": "DatasetReference",
-									"parameters": {
-										"schema": "dbo",
-										"table_name": {
-											"value": "@item().name",
-											"type": "Expression"
-										}
-									}
-								}
-							]
+							}
 						}
 					]
-				}
-			},
-			{
-				"name": "Get Metadata",
-				"type": "GetMetadata",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "Parquet",
-						"type": "DatasetReference",
-						"parameters": {
-							"container": {
-								"value": "@pipeline().parameters.container",
-								"type": "Expression"
-							},
-							"folder": {
-								"value": "@pipeline().parameters.folder",
-								"type": "Expression"
-							},
-							"object": "/"
-						}
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
 				}
 			}
 		],
@@ -140,6 +240,9 @@
 			"folder": {
 				"type": "string",
 				"defaultValue": "data"
+			},
+			"files": {
+				"type": "string"
 			}
 		},
 		"folder": {
