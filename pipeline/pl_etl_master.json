@@ -1,0 +1,45 @@
+{
+	"name": "pl_etl_master",
+	"properties": {
+		"activities": [
+			{
+				"name": "Transform",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_transform_raw_enriched",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Load into SQL DB",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Transform",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_load_datalake_to_dwh",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"container": "enriched",
+						"folder": "data"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
