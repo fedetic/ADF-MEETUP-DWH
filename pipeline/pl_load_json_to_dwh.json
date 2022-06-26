@@ -21,7 +21,7 @@
 					},
 					"activities": [
 						{
-							"name": "Load JSON into DWH",
+							"name": "Load parquet into DWH",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -34,14 +34,16 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "JsonSource",
+									"type": "ParquetSource",
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true,
+										"wildcardFolderPath": {
+											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
+											"type": "Expression"
+										},
+										"wildcardFileName": "*.parquet",
 										"enablePartitionDiscovery": false
-									},
-									"formatSettings": {
-										"type": "JsonReadSettings"
 									}
 								},
 								"sink": {
@@ -59,7 +61,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "json_file",
+									"referenceName": "Parquet",
 									"type": "DatasetReference",
 									"parameters": {
 										"container": {
@@ -70,10 +72,7 @@
 											"value": "@concat(pipeline().parameters.folder, '/', item().name)",
 											"type": "Expression"
 										},
-										"object": {
-											"value": "@concat(item().name, '.json')",
-											"type": "Expression"
-										}
+										"object": "*.parquet"
 									}
 								}
 							],
@@ -108,7 +107,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "json_file",
+						"referenceName": "Parquet",
 						"type": "DatasetReference",
 						"parameters": {
 							"container": {
@@ -127,10 +126,8 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "JsonReadSettings"
 					}
 				}
 			}
@@ -138,7 +135,7 @@
 		"parameters": {
 			"container": {
 				"type": "string",
-				"defaultValue": "raw"
+				"defaultValue": "enriched"
 			},
 			"folder": {
 				"type": "string",
