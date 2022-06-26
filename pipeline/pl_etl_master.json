@@ -48,8 +48,7 @@
 		],
 		"parameters": {
 			"files": {
-				"type": "string",
-				"defaultValue": "events"
+				"type": "string"
 			}
 		},
 		"annotations": []
