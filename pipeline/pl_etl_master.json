@@ -14,8 +14,8 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"tables": {
-							"value": "@pipeline().parameters.tables",
+						"files": {
+							"value": "@pipeline().parameters.files",
 							"type": "Expression"
 						}
 					}
@@ -47,8 +47,9 @@
 			}
 		],
 		"parameters": {
-			"tables": {
-				"type": "string"
+			"files": {
+				"type": "string",
+				"defaultValue": "events"
 			}
 		},
 		"annotations": []
