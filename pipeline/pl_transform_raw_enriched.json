@@ -15,7 +15,13 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Repos/joey.sun@viqtordavis.com/meetup-databricks/transform"
+					"notebookPath": "/Repos/joey.sun@viqtordavis.com/meetup-databricks/transform",
+					"baseParameters": {
+						"input": {
+							"value": "@pipeline().parameters.tables",
+							"type": "Expression"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "AzureDatabricks",
@@ -23,6 +29,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"tables": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Transform"
 		},
