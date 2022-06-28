@@ -44,6 +44,26 @@
 						"folder": "data"
 					}
 				}
+			},
+			{
+				"name": "Exec stored procs",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load into SQL DB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_stored_procs",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"parameters": {
