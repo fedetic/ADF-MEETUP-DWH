@@ -31,7 +31,8 @@
 		],
 		"parameters": {
 			"files": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "groups,users,venues,events"
 			}
 		},
 		"folder": {
