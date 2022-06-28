@@ -1,0 +1,112 @@
+{
+	"name": "pl_stored_procs",
+	"properties": {
+		"activities": [
+			{
+				"name": "Drop info_product tables",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[drop_tables_info_table]"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_meetup",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create users_enriched",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Drop info_product tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[create_users_enriched]"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_meetup",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create events_enriched",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Create users_enriched",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[create_events_enriched]"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_meetup",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Create events_rsvp",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Create events_enriched",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[create_events_rsvp]"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_meetup",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform"
+		},
+		"annotations": []
+	}
+}
